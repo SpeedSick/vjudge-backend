@@ -1,2 +1,4 @@
 src/core/venv
 .idea/
+src/.idea
+src/core/.idea
