@@ -2,3 +2,7 @@ src/core/venv
 .idea/
 src/.idea
 src/core/.idea
+venv
+.cache
+__pycache__
+*.sqlite3
