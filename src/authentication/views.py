@@ -1,5 +1,12 @@
-from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
+from rest_framework import permissions
 
-# Create your views here.
+from authentication.models import Profile
+from authentication.serializers import ProfileSerializer
 
-# todo
+
+class ProfileCreateAPIView(CreateAPIView):
+
+    permission_classes = (permissions.AllowAny,)
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
