@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_extensions',
     'rest_framework',
     'authentication',
     'grader',
@@ -131,9 +132,9 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = MappingProxyType(
     {
-        # 'DEFAULT_AUTHENTICATION_CLASSES': (
-        #    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        # ),
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         ),
@@ -145,3 +146,6 @@ REST_FRAMEWORK = MappingProxyType(
         ),
     }
 )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

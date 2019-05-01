@@ -3,7 +3,7 @@ from authentication.models import User
 
 
 class CourseParticipant(models.Model):
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='participants')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participations')
     joined = models.DateField(auto_now_add=True)

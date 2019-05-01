@@ -7,6 +7,6 @@ from django.db import models
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_teacher = models.BooleanField(default=False)
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=True)
     git_username = models.CharField(max_length=255)
 
