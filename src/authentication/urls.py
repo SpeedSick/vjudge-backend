@@ -17,10 +17,11 @@ Including another URLconf
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token
 
-from authentication.views import ProfileCreateAPIView
-
+from authentication.views import UserCreateAPIView, UserRetrieveAPIView, UserListAPIView
 
 urlpatterns = [
     path('auth/login', obtain_jwt_token, name='login'),
-    path('auth/register', ProfileCreateAPIView.as_view(), name='registration'),
+    path('auth/register', UserCreateAPIView.as_view(), name='registration'),
+    path('profile/<int:pk>', UserRetrieveAPIView.as_view(), name='user-detail'),
+    path('profile/', UserListAPIView.as_view(), name='user-list'),
 ]

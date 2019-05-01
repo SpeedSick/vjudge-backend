@@ -40,8 +40,8 @@ def main():
     )
 
     assignment = Assignment.objects.create(
+        course=course,
         name='Assignment 1',
-        teacher=user,
         description='description test test',
     )
 

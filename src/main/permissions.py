@@ -20,7 +20,7 @@ class StudentAccessPermission(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         profile = Profile.objects.filter(pk=request.user.id).last()
-        return not profile.is_provider
+        return not profile.is_teacher
 
 
 class TeacherAccessPermission(permissions.BasePermission):
@@ -30,7 +30,7 @@ class TeacherAccessPermission(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         profile = Profile.objects.filter(pk=request.user.id).last()
-        return profile.is_provider
+        return profile.is_teacher
 
 
 class ApprovedParticipantAccessPermission(permissions.BasePermission):

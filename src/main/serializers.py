@@ -55,15 +55,16 @@ class AssignmentSerializer(serializers.ModelSerializer):
         return instance
 
 
-class TaskSerializer(serializers.Serializer):
+class TaskSerializer(serializers.ModelSerializer):
     created = serializers.DateField(required=False)
     modified = serializers.DateField(required=False)
 
     class Meta:
         model = Task
+        fields = '__all__'
 
     def create(self, validated_data):
-        return Assignment.objects.create(**validated_data)
+        return Task.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
