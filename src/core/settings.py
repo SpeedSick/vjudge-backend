@@ -149,6 +149,7 @@ REST_FRAMEWORK = MappingProxyType(
     }
 )
 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -157,3 +158,6 @@ JWT_AUTH = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+X_API_KEY = "mad"
+

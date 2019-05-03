@@ -1,0 +1,14 @@
+version: '1'
+
+services:
+  task:
+    build: .
+    ports:
+      - 5000:5000
+
+  tester:
+    image: "alan:tester"
+    volumes:
+      - tests.yml:./src/tests.yml:rw
+    depends_on:
+      - task
