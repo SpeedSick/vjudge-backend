@@ -42,3 +42,8 @@ class Test(models.Model):
 class Submission(models.Model):
     task = models.ForeignKey(Task, related_name='submissions', on_delete=models.DO_NOTHING)
     course_participant = models.ForeignKey(CourseParticipant, related_name='submissions', on_delete=models.DO_NOTHING)
+
+
+class Result(models.Model):
+    submission = models.ForeignKey(Submission, related_name='results', on_delete=models.CASCADE)
+    score = models.DecimalField(decimal_places=2, default=0, max_digits=5)

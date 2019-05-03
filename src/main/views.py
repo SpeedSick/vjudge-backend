@@ -1,10 +1,13 @@
+from rest_framework import generics
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import Profile
-from .permissions import ApprovedUserAccessPermission, TeacherAccessPermission, StudentAccessPermission
-from .serializers import CourseSerializer, CourseParticipantSerializer, AssignmentSerializer, TaskSerializer
-from .models import Course, Assignment, Task, CourseParticipant
+from .permissions import ApprovedUserAccessPermission, TeacherAccessPermission, StudentAccessPermission, \
+    CustomTokenPermission
+from .serializers import CourseSerializer, CourseParticipantSerializer, AssignmentSerializer, TaskSerializer, \
+    ResultSerializer
+from .models import Course, Assignment, Task, CourseParticipant, Result
 
 
 class CourseViewSet(ModelViewSet):
@@ -140,3 +143,9 @@ class TaskViewSet(ModelViewSet):
         else:
             queryset = queryset.none()
         return queryset
+
+
+class ResultCreateAPIView(generics.CreateAPIView):
+    serializer_class = ResultSerializer
+    queryset = Result.objects.all()
+    permission_classes = (CustomTokenPermission,)

@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 from authentication.models import Profile
+from core import settings
 
 
 class ApprovedUserAccessPermission(permissions.BasePermission):
@@ -40,3 +41,9 @@ class ApprovedParticipantAccessPermission(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         return True
+
+
+class CustomTokenPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        print(request.META)
+        return settings.X_API_KEY == request.META.get('HTTP_X_API_KEY')
