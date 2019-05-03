@@ -16,12 +16,14 @@ Including another URLconf
 
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework.routers import DefaultRouter
 
-from authentication.views import UserCreateAPIView, UserRetrieveAPIView, UserListAPIView
+from authentication.views import UserViewSet
+
+router = DefaultRouter()
+
+router.register(r'users', UserViewSet, basename='User')
 
 urlpatterns = [
-    path('auth/login', obtain_jwt_token, name='login'),
-    path('auth/register', UserCreateAPIView.as_view(), name='registration'),
-    path('profile/<int:pk>', UserRetrieveAPIView.as_view(), name='user-detail'),
-    path('profile/', UserListAPIView.as_view(), name='user-list'),
-]
+                  path('login/', obtain_jwt_token, name='login'),
+              ] + router.urls

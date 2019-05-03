@@ -4,9 +4,16 @@ from authentication.models import Profile, User
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)
+
     class Meta:
         model = Profile
         exclude = ('user', 'is_approved', 'git_username',)
+
+    def update(self, instance, validated_data):
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.save()
+        return
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,6 +34,15 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        if 'profile' in validated_data:
+            profile_data = validated_data.pop('profile')
+            profile = Profile.objects.get(pk=instance.id)
+            serialized = ProfileSerializer(data=profile_data)
+            if serialized.is_valid():
+                serialized.update(profile, serialized.validated_data)
+            profile.user = instance
+            profile.save()
+
         instance.first_name = validated_data.get('first_name')
         instance.last_name = validated_data.get('last_name')
         instance.save()
