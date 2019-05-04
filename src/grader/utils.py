@@ -18,9 +18,9 @@ class cd:
 
 
 # TODO: celery task
-def pull_or_clone(profile, new_folder, git_repository_name):
+def pull_or_clone(profile, user_folder, git_repository_name):
 	git_link = "https://github.com/{}/{}.git".format(profile.git_username, git_repository_name)
-	with cd(new_folder):
+	with cd(user_folder):
 		pull_or_clone = "git -C {} pull || git clone {} {}".format(git_repository_name, git_link, git_repository_name)
 		os.system(pull_or_clone)
 
@@ -30,32 +30,39 @@ def stop_containers():
 def start_containers():
 	os.system("sudo docker-compose up --abort-on-container-exit")
 
-def grade(profiles, submissions):
-	for profile in profiles:
-		pull_or_clone(profile)
+def grade(course_participants, submissions):
+
+	for cp in course_participants:
+		profile = cp.student
+		git_username = profile.git_username
+		git_repository_name = cp.git_repository_name
+		user_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
+		os.system("mkdir -p {}".format(user_folder))
+		pull_or_clone(profile, user_folder, git_repository_name)
 
 	for submission in submissions:
 		submission_id = submission.id
 		task = submission.task
 		task_name = task.folder_name
+		testfile = task.testfile
+		testfile_path = core.settings.MEDIA_ROOT + testfile.name
 		assignment = task.assignment
 		assignment_name = assignment.folder_name
+
 		course_participant = submission.course_participant
 		git_repository_name = course_participant.git_repository_name
 		profile = course_participant.student
 		git_username = profile.git_username
-		testfile = task.testfile
-		testfile_path = core.settings.MEDIA_ROOT + testfile.name
 
-		new_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
-		os.system("mkdir -p {}".format(new_folder))
-		pull_or_clone(profile, new_folder, git_repository_name)
+		user_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
+		# os.system("mkdir -p {}".format(new_folder))
+		# pull_or_clone(profile, new_folder, git_repository_name)
 
 		tests_file = "{}/../../../repositories/{}/{}/{}/{}/tests.yml".format(os.path.dirname(os.path.realpath(__file__)), \
 																git_username, git_repository_name, assignment_name, task_name)
 		os.system("cp {} {}".format(testfile_path, tests_file))
 
-		task_folder = "{}/{}/src/{}/{}".format(new_folder, git_repository_name, assignment_name, task_name)
+		task_folder = "{}/{}/src/{}/{}".format(user_folder, git_repository_name, assignment_name, task_name)
 
 		with cd(task_folder):
 			os.system("cp {} .".format(DOCKERCOMPOSE_PATH))
