@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, CourseParticipant, Assignment, Task
+from .models import Course, CourseParticipant, Assignment, Task, Result, Submission
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -71,3 +71,21 @@ class TaskSerializer(serializers.ModelSerializer):
         instance.description = validated_data.get('description', instance.description)
         instance.save()
         return instance
+
+
+class ResultSerializer(serializers.ModelSerializer):
+    submission = serializers.PrimaryKeyRelatedField(queryset=Submission.objects.all(), many=False)
+    created = serializers.DateTimeField(required=False)
+
+    class Meta:
+        model = Result
+        fields = ('submission', 'score', 'created')
+
+    def create(self, validated_data):
+        print(validated_data)
+        result = Result.objects.create(
+            submission=validated_data['submission'],
+            score=validated_data['score']
+        )
+        print(result)
+        return result
