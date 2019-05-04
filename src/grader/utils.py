@@ -18,16 +18,14 @@ class cd:
 
 
 # TODO: celery task
-def pull_or_clone(profile, new_folder):
-	git_link = profile.git_username
+def pull_or_clone(profile, new_folder, git_repository_name):
+	git_link = "https://github.com/{}/{}.git".format(profile.git_username, git_repository_name)
 	with cd(new_folder):
-		pull_or_clone = "git -C repo pull || git clone {} repo".format(git_link)
+		pull_or_clone = "git -C {} pull || git clone {} {}".format(git_repository_name, git_link, git_repository_name)
 		os.system(pull_or_clone)
-
 
 def stop_containers():
 	os.system("sudo docker-compose down")
-
 
 def start_containers():
 	os.system("sudo docker-compose up --abort-on-container-exit")
@@ -51,13 +49,13 @@ def grade(profiles, submissions):
 
 		new_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
 		os.system("mkdir -p {}".format(new_folder))
-		pull_or_clone(profile, new_folder)
+		pull_or_clone(profile, new_folder, git_repository_name)
 
 		tests_file = "{}/../../../repositories/{}/{}/{}/{}/tests.yml".format(os.path.dirname(os.path.realpath(__file__)), \
 																git_username, git_repository_name, assignment_name, task_name)
 		os.system("cp {} {}".format(testfile_path, tests_file))
 
-		task_folder = "{}/{}/{}/{}".format(new_folder, git_repository_name, assignment_name, task_name)
+		task_folder = "{}/{}/src/{}/{}".format(new_folder, git_repository_name, assignment_name, task_name)
 
 		with cd(task_folder):
 			os.system("cp {} .".format(DOCKERCOMPOSE_PATH))
