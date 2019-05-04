@@ -41,13 +41,10 @@ def grade(course_participants, submissions):
 		pull_or_clone(profile, user_folder, git_repository_name)
 
 	for submission in submissions:
-		submission_id = submission.id
 		task = submission.task
 		task_name = task.folder_name
-		testfile = task.testfile
-		testfile_path = core.settings.MEDIA_ROOT + testfile.name
-		assignment = task.assignment
-		assignment_name = assignment.folder_name
+		testfile_path = core.settings.MEDIA_ROOT + task.testfile.name
+		assignment_name = task.assignment.folder_name
 
 		course_participant = submission.course_participant
 		git_repository_name = course_participant.git_repository_name
@@ -55,24 +52,16 @@ def grade(course_participants, submissions):
 		git_username = profile.git_username
 
 		user_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
-		# os.system("mkdir -p {}".format(new_folder))
-		# pull_or_clone(profile, new_folder, git_repository_name)
-
-		tests_file = "{}/../../../repositories/{}/{}/{}/{}/tests.yml".format(os.path.dirname(os.path.realpath(__file__)), \
-																git_username, git_repository_name, assignment_name, task_name)
-		os.system("cp {} {}".format(testfile_path, tests_file))
-
 		task_folder = "{}/{}/src/{}/{}".format(user_folder, git_repository_name, assignment_name, task_name)
-
 		with cd(task_folder):
+			os.system("cp {} tests.yml".format(testfile_path))
 			os.system("cp {} .".format(DOCKERCOMPOSE_PATH))
 			os.system("cp {} .".format(DOCKERFILE_PATH))
 			os.system("touch env.yml")
 			with open("env.yml", "a") as f:
-				f.write("submission_id: {}\n".format(submission_id))
+				f.write("submission_id: {}\n".format(submission.id))
 				f.write("X_API_KEY: {}".format(core.settings.X_API_KEY))
 			start_containers()
-			# stop_containers()
 
 
 if __name__ == "__main__":
