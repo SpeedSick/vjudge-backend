@@ -7,7 +7,7 @@ class CourseParticipant(models.Model):
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='participants')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participations')
     joined = models.DateField(auto_now_add=True)
-
+    git_repository_name  = models.CharField(max_length=255)
 
 class Course(models.Model):
     teacher = models.ForeignKey(User, related_name='teacher_courses', on_delete=models.DO_NOTHING)
@@ -32,11 +32,7 @@ class Task(models.Model):
     description = models.CharField(max_length=1023)
     created = models.DateField(auto_now_add=True)
     modified = models.DateField(auto_now=True)
-
-
-class Test(models.Model):
-    task = models.ForeignKey(Task, related_name='tests', on_delete=models.CASCADE)
-    test_file = models.FileField()
+    testfile = models.FileField(null=True)
 
 
 class Submission(models.Model):

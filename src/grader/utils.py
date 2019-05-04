@@ -43,20 +43,21 @@ def grade(profiles, submissions):
 		assignment = task.assignment
 		assignment_name = assignment.folder_name
 		course_participant = submission.course_participant
+		git_repository_name = course_participant.git_repository_name
 		profile = course_participant.student
 		git_username = profile.git_username
-		test = task.test
-		filename = test.name
+		testfile = task.testfile
+		testfile_path = core.settings.MEDIA_ROOT + testfile.name
 
 		new_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
 		os.system("mkdir -p {}".format(new_folder))
-		tests_file = "{}/../../../repositories/{}/{}/{}/tests.yml".format(os.path.dirname(os.path.realpath(__file__)), \
-																git_username, assignment_name, task_name)
-		os.system("cp {} {}".format(filename, tests_file))
 		pull_or_clone(profile, new_folder)
 
-		task_folder = "{}/{}/{}".format(new_folder, assignment_name, task_name)
+		tests_file = "{}/../../../repositories/{}/{}/{}/{}/tests.yml".format(os.path.dirname(os.path.realpath(__file__)), \
+																git_username, git_repository_name, assignment_name, task_name)
+		os.system("cp {} {}".format(testfile_path, tests_file))
 
+		task_folder = "{}/{}/{}/{}".format(new_folder, git_repository_name, assignment_name, task_name)
 
 		with cd(task_folder):
 			os.system("cp {} .".format(DOCKERCOMPOSE_PATH))
