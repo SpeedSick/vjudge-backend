@@ -19,6 +19,7 @@ class Course(models.Model):
 
 class Assignment(models.Model):
     course = models.ForeignKey(Course, related_name='assignments', on_delete=models.CASCADE)
+    folder_name = models.CharField(default='', max_length=255)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=2047)
     deadline = models.DateTimeField(null=True)
@@ -28,6 +29,7 @@ class Assignment(models.Model):
 
 class Task(models.Model):
     assignment = models.ForeignKey(Assignment, related_name='tasks', on_delete=models.CASCADE)
+    folder_name = models.CharField(default='', max_length=255)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=1023)
     created = models.DateField(auto_now_add=True)
