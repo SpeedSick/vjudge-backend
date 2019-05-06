@@ -18,3 +18,21 @@ services:
       DJANGO_SETTINGS_MODULE: core.settings
     depends_on:
       - db
+  celery:
+    restart: always
+    build: .
+    volumes_from:
+      - web
+    command: celery -A mlm worker -l info -B
+    environment:
+      - C_FORCE_ROOT=true
+      - DJANGO_SETTINGS_MODULE=mlm.dev_settings
+  rabbit:
+    restart: always
+    image: rabbitmq:alpine
+    ports:
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=diploma
+      - RABBITMQ_DEFAULT_PASS=diploma
+      - RABBITMQ_DEFAULT_VHOST=diploma
