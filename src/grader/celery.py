@@ -89,7 +89,6 @@ def check_submissions(submissions):
                 f.write("X_API_KEY: {}".format(core.settings.X_API_KEY))
             start_containers()
 
-
 @app.task(bind=True)
 def grade(course_participants, submissions):
     git_pull_group = group(pull_or_clone(get_profile(cp), get_user_folder(cp),\
