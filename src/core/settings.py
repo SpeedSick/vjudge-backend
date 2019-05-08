@@ -160,3 +160,4 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 X_API_KEY = "mad"
 
+BROKER_URL = 'pyamqp://diploma:diploma@rabbit:5672/diploma'
