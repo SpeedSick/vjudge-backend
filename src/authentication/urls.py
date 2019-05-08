@@ -18,7 +18,7 @@ from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework.routers import DefaultRouter
 
-from authentication.views import UserViewSet
+from authentication.views import UserViewSet, StudentsListView, TeachersListView
 
 router = DefaultRouter()
 
@@ -26,4 +26,6 @@ router.register(r'users', UserViewSet, basename='User')
 
 urlpatterns = [
                   path('login/', obtain_jwt_token, name='login'),
+                  path('students/', StudentsListView.as_view(), name='students-list'),
+                  path('teachers/', TeachersListView.as_view(), name='teachers-list'),
               ] + router.urls
