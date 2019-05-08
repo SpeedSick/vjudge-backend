@@ -45,5 +45,4 @@ class ApprovedParticipantAccessPermission(permissions.BasePermission):
 
 class CustomTokenPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        print(request.META)
         return settings.X_API_KEY == request.META.get('HTTP_X_API_KEY')
