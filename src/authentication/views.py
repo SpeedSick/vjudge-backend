@@ -26,12 +26,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class StudentsListView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, TeacherAccessPermission,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = User.objects.filter(profile__is_teacher=False)
     serializer_class = UserSerializer
 
 
 class TeachersListView(generics.ListAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, TeacherAccessPermission,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = User.objects.filter(Q(profile__is_teacher=True) & Q(profile__is_approved=True))
     serializer_class = UserSerializer
