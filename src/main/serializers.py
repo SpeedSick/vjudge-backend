@@ -82,10 +82,8 @@ class ResultSerializer(serializers.ModelSerializer):
         fields = ('submission', 'score', 'created')
 
     def create(self, validated_data):
-        print(validated_data)
         result = Result.objects.create(
             submission=validated_data['submission'],
             score=validated_data['score']
         )
-        print(result)
         return result

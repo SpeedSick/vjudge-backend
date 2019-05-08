@@ -1,8 +1,7 @@
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, ListAPIView
-from rest_framework import permissions, mixins, viewsets
+from rest_framework import permissions, viewsets
 
-from authentication.models import User, Profile
-from authentication.serializers import UserSerializer
+from authentication.models import User
+from authentication.serializers import UserSerializer, UserPostSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -17,4 +16,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 queryset = queryset.none()
         return queryset
 
-    serializer_class = UserSerializer
+    def get_serializer_class(self):
+        serializer_class = UserSerializer
+        if self.action in ('update', 'partial_update',):
+            serializer_class = UserPostSerializer
+        return serializer_class

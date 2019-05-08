@@ -12,6 +12,8 @@ def main():
         password='ZeroTwoHiro1',
         email='alan@alan.alan',
     )
+    user.set_password('ZeroTwoHiro1')
+    user.save()
 
     profile = Profile.objects.create(
         user=user,
@@ -26,6 +28,8 @@ def main():
         password='ZeroTwoHiro2',
         email='almat@almat.almat',
     )
+    student.set_password('ZeroTwoHiro2')
+    student.save()
 
     student_profile = Profile.objects.create(
         user=student,

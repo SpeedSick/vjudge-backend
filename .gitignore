@@ -1,7 +1,7 @@
 .coverage
 src/core/venv
 .idea/
-src/env
+src/env/
 src/.idea
 src/core/.idea
 venv

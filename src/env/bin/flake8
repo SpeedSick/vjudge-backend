@@ -1,4 +1,5 @@
-#!/Users/macbook/diploma/vjudge-backend/src/env/bin/python
+#!/home/alan/work/backend/vjudge-backend/src/env/bin/python
+
 # -*- coding: utf-8 -*-
 import re
 import sys
