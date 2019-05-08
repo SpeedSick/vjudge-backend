@@ -21,12 +21,14 @@ services:
   celery:
     restart: always
     build: .
-    volumes_from:
-      - web
-    command: celery -A mlm worker -l info -B
+    command: celery -A core worker -l info -B
+    volumes:
+      - ./src:/src
     environment:
       - C_FORCE_ROOT=true
-      - DJANGO_SETTINGS_MODULE=mlm.dev_settings
+      - DJANGO_SETTINGS_MODULE=core.settings
+    depends_on:
+      - rabbit
   rabbit:
     restart: always
     image: rabbitmq:alpine
