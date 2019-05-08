@@ -3,6 +3,8 @@ from celery import group, chain, shared_task
 import core.settings
 import os
 from core.celery import app
+from authentication.models import Profile
+from main.models import CourseParticipant, Submission
 
 DOCKERFILE_PATH = "docker_files/Dockerfile"
 DOCKERCOMPOSE_PATH = "docker_files/docker-compose.yml"
@@ -44,6 +46,7 @@ def get_git_repository_name(cp):
     git_repository_name = cp.git_repository_name
     return git_repository_name
 
+
 @app.task
 def pull_or_clone(profile, user_folder, git_repository_name):
     git_link = "https://github.com/{}/{}.git".format(profile.git_username, git_repository_name)
@@ -77,12 +80,22 @@ def check_submissions(submissions):
                 f.write("X_API_KEY: {}".format(core.settings.X_API_KEY))
             start_containers()
 
+
 @app.task
-def grade(course_participants, submissions):
+def grade(course_participant_ids, submission_ids):
+
+    course_participants = []
+    for id in course_participant_ids:
+        cp = CourseParticipant.objects.get(id=id)
+        course_participants.append(cp)
+
+    submissions = []
+    for id in submission_ids:
+        s = Submission.objects.get(id=id)
+        submissions.append(s)
+
     git_pull_group = group(pull_or_clone(get_profile(cp), get_user_folder(cp),\
                                          get_git_repository_name(cp)) for cp in course_participants)
 
     job = chain(git_pull_group.si(), check_submissions(submissions).si())
     job.apply_sync()
-
-
