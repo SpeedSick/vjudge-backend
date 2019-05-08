@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from authentication.models import Profile
 from .models import Course, CourseParticipant, Assignment, Task, Result, Submission
 
 
@@ -30,8 +32,14 @@ class CourseParticipantSerializer(serializers.ModelSerializer):
         exclude = ('is_approved',)
 
     def create(self, validated_data):
-        student = self.context['request'].user
-        return CourseParticipant.objects.create(**validated_data, student=student)
+        user = self.context['request'].user
+        user_profile = Profile.objects.get(id=user.id)
+        if not user_profile.is_teacher:
+            user = validated_data.pop('student')
+        if 'student' in validated_data:
+            validated_data.pop('student')
+
+        return CourseParticipant.objects.create(**validated_data, student=user)
 
 
 class AssignmentSerializer(serializers.ModelSerializer):

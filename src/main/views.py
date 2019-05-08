@@ -48,7 +48,6 @@ class CourseParticipantViewSet(ModelViewSet):
             permission_classes = [
                 IsAuthenticated,
                 ApprovedUserAccessPermission,
-                StudentAccessPermission,
             ]
         return [permission() for permission in permission_classes]
 

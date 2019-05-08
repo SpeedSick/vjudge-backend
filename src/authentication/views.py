@@ -7,7 +7,7 @@ from main.permissions import TeacherAccessPermission
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
         queryset = User.objects.all()

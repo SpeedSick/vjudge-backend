@@ -7,7 +7,8 @@ class CourseParticipant(models.Model):
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='participants')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='participations')
     joined = models.DateField(auto_now_add=True)
-    git_repository_name  = models.CharField(max_length=255)
+    git_repository_name = models.CharField(max_length=255)
+
 
 class Course(models.Model):
     teacher = models.ForeignKey(User, related_name='teacher_courses', on_delete=models.DO_NOTHING)
