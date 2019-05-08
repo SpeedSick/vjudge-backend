@@ -10,3 +10,4 @@ __pycache__
 *.sqlite3
 db
 .pytest_cache
+src/celerybeat-schedule
