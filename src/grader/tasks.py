@@ -2,8 +2,8 @@ from __future__ import absolute_import
 from celery import group, chain, shared_task
 import core.settings
 import os
-from core.celery import app
 from authentication.models import Profile
+from core.celery import app
 from main.models import CourseParticipant, Submission
 
 DOCKERFILE_PATH = "docker_files/Dockerfile"
@@ -31,13 +31,13 @@ def start_containers():
     os.system("sudo docker-compose up --abort-on-container-exit")
 
 
-def get_profile(cp):
-    return cp.profile
+def get_profile_id(cp):
+    return cp.student.profile.id
 
 
 def get_user_folder(cp):
-    profile = cp.student
-    git_username = profile.git_username
+    user = cp.student
+    git_username = user.profile.git_username
     user_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
     return user_folder
 
@@ -48,15 +48,22 @@ def get_git_repository_name(cp):
 
 
 @app.task
-def pull_or_clone(profile, user_folder, git_repository_name):
+def pull_or_clone(profile_id, user_folder, git_repository_name):
+    profile = Profile.objects.get(id=profile_id)
     git_link = "https://github.com/{}/{}.git".format(profile.git_username, git_repository_name)
+    os.system("mkdir -p {}".format(user_folder))
     with cd(user_folder):
         pull_or_clone_command = "git -C {} pull || git clone {} {}".format(git_repository_name, git_link, git_repository_name)
         os.system(pull_or_clone_command)
 
 
 @app.task
-def check_submissions(submissions):
+def check_submissions(submission_ids):
+    submissions = []
+    for id in submission_ids:
+        s = Submission.objects.get(id=id)
+        submissions.append(s)
+
     for submission in submissions:
         task = submission.task
         task_name = task.folder_name
@@ -65,8 +72,8 @@ def check_submissions(submissions):
 
         course_participant = submission.course_participant
         git_repository_name = course_participant.git_repository_name
-        profile = course_participant.student
-        git_username = profile.git_username
+        user = course_participant.student
+        git_username = user.profile.git_username
 
         user_folder = "{}/../../../repositories/{}".format(os.path.dirname(os.path.realpath(__file__)), git_username)
         task_folder = "{}/{}/src/{}/{}".format(user_folder, git_repository_name, assignment_name, task_name)
@@ -89,13 +96,9 @@ def grade(course_participant_ids, submission_ids):
         cp = CourseParticipant.objects.get(id=id)
         course_participants.append(cp)
 
-    submissions = []
-    for id in submission_ids:
-        s = Submission.objects.get(id=id)
-        submissions.append(s)
 
-    git_pull_group = group(pull_or_clone(get_profile(cp), get_user_folder(cp),\
+    git_pull_group = group(pull_or_clone.s(get_profile_id(cp), get_user_folder(cp),\
                                          get_git_repository_name(cp)) for cp in course_participants)
-
-    job = chain(git_pull_group.si(), check_submissions(submissions).si())
-    job.apply_sync()
+    # git_pull_group()
+    job = chain(git_pull_group, check_submissions.s(submission_ids))
+    job()
