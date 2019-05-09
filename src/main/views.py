@@ -1,11 +1,16 @@
-from rest_framework import generics
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import Profile
+from main.serializers.course import CourseRetrieveSerializer
+from main.serializers.course_participant import CourseParticipantApproveSerializer
 from .permissions import ApprovedUserAccessPermission, TeacherAccessPermission, StudentAccessPermission, \
     CustomTokenPermission
-from .serializers import CourseSerializer, CourseParticipantSerializer, AssignmentSerializer, TaskSerializer, \
+from .serializers import CoursePostSerializer, CourseGetSerializer, CourseParticipantSerializer, AssignmentSerializer, \
+    TaskSerializer, \
     ResultSerializer
 from .models import Course, Assignment, Task, CourseParticipant, Result
 
@@ -21,33 +26,35 @@ class CourseViewSet(ModelViewSet):
             ]
         return [permission() for permission in permission_classes]
 
-    serializer_class = CourseSerializer
+    def get_serializer_class(self):
+        serializer_class = CourseGetSerializer
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            serializer_class = CoursePostSerializer
+        elif self.action == 'retrieve':
+            serializer_class = CourseRetrieveSerializer
+        return serializer_class
 
     def get_queryset(self):
         queryset = Course.objects.all()
         data = self.request.query_params
-
         if self.action in ('update', 'partial_update', 'destroy'):
             queryset = queryset.filter(teacher=self.request.user)
-
         if 'teacher' in data:
             queryset = queryset.filter(teacher=data['teacher'])
-        print(queryset)
         if 'student' in data:
             queryset = queryset.filter(participants__student=self.request.user)
-        print(queryset)
-        print('wtf')
-
         return queryset.order_by('-modified')
 
 
 class CourseParticipantViewSet(ModelViewSet):
     def get_permissions(self):
-        permission_classes = []
-        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+        permission_classes = [
+            IsAuthenticated,
+            ApprovedUserAccessPermission,
+        ]
+        if self.action in ('update', 'partial_update', 'destroy'):
             permission_classes = [
-                IsAuthenticated,
-                ApprovedUserAccessPermission,
+                permissions.IsAdminUser
             ]
         return [permission() for permission in permission_classes]
 
@@ -148,3 +155,20 @@ class ResultCreateAPIView(generics.CreateAPIView):
     serializer_class = ResultSerializer
     queryset = Result.objects.all()
     permission_classes = (CustomTokenPermission,)
+
+
+class ApproveCourseParticipant(APIView):
+    permission_classes = (IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission)
+
+    def post(self, request, format=None):
+
+        serialized = CourseParticipantApproveSerializer(data=self.request.data)
+        if serialized.is_valid():
+            course = serialized.validated_data['course']
+            if course.teacher_id == self.request.user.id:
+                serialized.approve()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

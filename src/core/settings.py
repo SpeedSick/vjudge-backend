@@ -133,9 +133,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 REST_FRAMEWORK = MappingProxyType(
     {
-        #'DEFAULT_AUTHENTICATION_CLASSES': (
-        #    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        #),
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.AllowAny',
         ),
