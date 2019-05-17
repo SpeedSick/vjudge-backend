@@ -37,10 +37,10 @@ class CourseParticipantSerializer(serializers.ModelSerializer):
 class CourseParticipantUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseParticipant
-        fields = ('git_username',)
+        fields = ('git_repository_name',)
 
     def update(self, instance, validated_data):
-        instance.git_username = validated_data.get('git_username', instance.git_username)
+        instance.git_repository_name = validated_data.get('git_repository_name', instance.git_repository_name)
         instance.save()
         return instance
 

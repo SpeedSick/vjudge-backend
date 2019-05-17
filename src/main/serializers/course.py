@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from authentication.serializers import UserSerializer
-from main.models import Course
+from main.models import Course, News
 from main.serializers import AssignmentSerializer
 from main.utils import get_or_create_course_participant
 
@@ -38,18 +38,40 @@ class CoursePostSerializer(serializers.ModelSerializer):
         return instance
 
 
+class NewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = News
+        fields = ('message',)
+
+
 class CourseGetSerializer(serializers.ModelSerializer):
     teacher = UserSerializer()
+    notifications = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Course
-        fields = ('id', 'teacher', 'name', 'description', 'created', 'modified', 'participants', 'image',)
-
-
-class CourseRetrieveSerializer(serializers.ModelSerializer):
-    assignments = AssignmentSerializer(many=True)
+    def get_notifications(self, instance):
+        if self.context['request'].user.is_anonymous:
+            return []
+        return [NewsSerializer(instance=x).data for x in
+                instance.notifications.filter(user=self.context['request'].user)]
 
     class Meta:
         model = Course
         fields = (
-            'id', 'teacher', 'name', 'description', 'created', 'modified', 'participants', 'image', 'assignments',)
+            'id', 'teacher', 'name', 'description', 'created', 'modified', 'students', 'image', 'notifications',)
+
+
+class CourseRetrieveSerializer(serializers.ModelSerializer):
+    assignments = AssignmentSerializer(many=True)
+    notifications = serializers.SerializerMethodField()
+
+    def get_notifications(self, instance):
+        if self.context['request'].user.is_anonymous:
+            return []
+        return [NewsSerializer(instance=x).data for x in
+                instance.notifications.filter(user=self.context['request'].user)]
+
+    class Meta:
+        model = Course
+        fields = (
+            'id', 'teacher', 'name', 'description', 'created', 'modified', 'students', 'image', 'assignments',
+            'notifications',)
