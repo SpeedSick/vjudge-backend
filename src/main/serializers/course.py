@@ -49,6 +49,8 @@ class CourseGetSerializer(serializers.ModelSerializer):
     notifications = serializers.SerializerMethodField()
 
     def get_notifications(self, instance):
+        if self.context['request'].user.is_anonymous:
+            return []
         return [NewsSerializer(instance=x).data for x in
                 instance.notifications.filter(user=self.context['request'].user)]
 
@@ -63,6 +65,8 @@ class CourseRetrieveSerializer(serializers.ModelSerializer):
     notifications = serializers.SerializerMethodField()
 
     def get_notifications(self, instance):
+        if self.context['request'].user.is_anonymous:
+            return []
         return [NewsSerializer(instance=x).data for x in
                 instance.notifications.filter(user=self.context['request'].user)]
 
