@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_rest_passwordreset',
     'corsheaders',
     'django_extensions',
     'rest_framework',
@@ -148,7 +149,6 @@ REST_FRAMEWORK = MappingProxyType(
     }
 )
 
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -162,3 +162,13 @@ X_API_KEY = "mad"
 
 BROKER_URL = 'pyamqp://diploma:diploma@rabbit:5672/diploma'
 # BROKER_URL = 'pyamqp://mlm:mlm@rabbit:5672/mlm'
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = 'alan.amanov98@gmail.com'
+
+EMAIL_HOST_PASSWORD = 't5amor31989A*'
+
+EMAIL_PORT = 587
