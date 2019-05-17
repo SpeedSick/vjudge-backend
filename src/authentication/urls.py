@@ -18,7 +18,8 @@ from django.urls import path, include
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework.routers import DefaultRouter
 
-from authentication.views import UserViewSet, StudentsListView, TeachersListView
+from authentication.views import UserViewSet, StudentsListView, TeachersListView, PasswordChangeView, PasswordResetView, \
+    PasswordResetConfirmView
 
 router = DefaultRouter()
 
@@ -28,5 +29,9 @@ urlpatterns = [
                   path('login/', obtain_jwt_token, name='login'),
                   path('students/', StudentsListView.as_view(), name='students-list'),
                   path('teachers/', TeachersListView.as_view(), name='teachers-list'),
-                  url(r'^api/password_reset/', include('django_rest_passwordreset.urls', namespace='password_reset')),
+                  path(route='change_password/', view=PasswordChangeView.as_view(), name='change_password'),
+                  path(route='password_reset/', view=PasswordResetView.as_view(), name='password_reset'),
+                  path(route='password_reset/<slug:reset_token>/', view=PasswordResetConfirmView.as_view(),
+                       name='password_reset_confirm')
+
               ] + router.urls
