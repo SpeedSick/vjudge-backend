@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
-from authentication.models import Profile
+from authentication.models import Profile, User
 from main.models import News
 from main.serializers.course import CourseRetrieveSerializer
 from main.serializers.course_participant import CourseParticipantApproveSerializer, CourseParticipantUpdateSerializer
@@ -109,7 +109,8 @@ class AssignmentViewSet(ModelViewSet):
                 queryset = queryset.none()
 
         elif 'student' in data:
-            queryset = queryset.filter(student=self.request.user.id)
+            queryset = queryset.filter(course__participants__student=self.request.user.id)
+            print(queryset)
         else:
             queryset = queryset.none()
 
@@ -175,11 +176,11 @@ class AssignmentsList(generics.ListAPIView):
     permissions_classes = (IsAuthenticated, ApprovedUserAccessPermission, StudentAccessPermission,)
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = Assignment.objects.none()
-        courses = user.participations.filter(is_approved=True)
-        for course in courses:
-            queryset = queryset | course.assignments
+        if self.request.user.is_anonymous:
+            return Assignment.objects.none()
+        queryset = Assignment.objects.all()
+        queryset = queryset.filter(course__participants__student=self.request.user.id) | queryset.filter(
+            course__teacher=self.request.user.id)
         return queryset.filter('-created')
 
     serializer_class = AssignmentSerializer

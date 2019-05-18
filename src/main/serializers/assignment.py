@@ -7,7 +7,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     course = serializers.PrimaryKeyRelatedField(many=False, queryset=Course.objects.all())
     created = serializers.DateField(required=False)
     modified = serializers.DateField(required=False)
-    deadline = serializers.DateField(required=False)
+    deadline = serializers.DateTimeField(required=False)
 
     class Meta:
         model = Assignment
