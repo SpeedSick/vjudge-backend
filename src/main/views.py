@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from authentication.models import Profile, User
 from grader.tasks import check_submissions
 from main.models import News, Submission
-from main.serializers.course import CourseRetrieveSerializer
 from main.serializers.course_participant import CourseParticipantApproveSerializer, CourseParticipantUpdateSerializer
 from main.serializers.submission import SubmissionSerializer, SubmissionRetrieveSerializer
 from main.utils import get_profile
@@ -38,11 +37,9 @@ class CourseViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-        serializer_class = CourseRetrieveSerializer
+        serializer_class = CourseGetSerializer
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
             serializer_class = CoursePostSerializer
-        elif self.action == 'retrieve':
-            serializer_class = CourseRetrieveSerializer
         elif self.action == 'register':
             serializer_class = CourseParticipantUpdateSerializer
         return serializer_class
@@ -119,6 +116,11 @@ class TaskViewSet(ModelViewSet):
                 ApprovedUserAccessPermission,
                 TeacherAccessPermission,
             ]
+        else:
+            permission_classes = [
+                IsAuthenticated,
+                ApprovedUserAccessPermission,
+            ]
         return [permission() for permission in permission_classes]
 
     serializer_class = TaskSerializer
@@ -129,7 +131,9 @@ class TaskViewSet(ModelViewSet):
         if self.action in ('update', 'partial_update', 'destroy'):
             queryset = queryset.filter(assignment__course__teacher=self.request.user)
         if 'assignment' in data:
-            profile = Profile.objects.filter(user=self.request.user).last()
+            profile = get_profile(self.request.user)
+            if profile is None:
+                return Task.objects.none()
             assignment = Assignment.objects.filter(pk=data['assignment']).last()
             if profile.is_teacher:
                 queryset = queryset.filter(assignment=assignment)
@@ -137,7 +141,8 @@ class TaskViewSet(ModelViewSet):
                 queryset = queryset.filter(assignment=assignment,
                                            assignment__course__participants__student=self.request.user)
         else:
-            queryset = queryset.none()
+            queryset = queryset.filter(assignment__course__teacher=self.request.user) | queryset.filter(
+                assignment__course__participants__student=self.request.user)
         return queryset
 
 

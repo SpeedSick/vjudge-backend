@@ -52,12 +52,15 @@ class Course(models.Model):
 
     @property
     def students(self):
-        return [course_participant.student.id for course_participant in
-                CourseParticipant.objects.filter(Q(course=self) & Q(is_approved=True))]
+        return User.objects.filter(Q(participations__course=self) & Q(participations__is_approved=True))
 
     @property
     def notifications(self):
         return self.news.filter(seen=False)
+
+    @property
+    def non_approved_students(self):
+        return User.objects.filter(Q(participations__course=self) & Q(participations__is_approved=True))
 
 
 class News(models.Model):

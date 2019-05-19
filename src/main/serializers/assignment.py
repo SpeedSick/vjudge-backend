@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from main.models import Course, Assignment
+from .task import TaskSerializer
 
 
 class AssignmentSerializer(serializers.ModelSerializer):
@@ -8,6 +9,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
     created = serializers.DateField(required=False)
     modified = serializers.DateField(required=False)
     deadline = serializers.DateTimeField(required=False)
+
+    tasks = TaskSerializer(many=True)
 
     class Meta:
         model = Assignment
