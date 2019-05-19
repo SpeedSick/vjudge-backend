@@ -151,7 +151,6 @@ class ResultCreateAPIView(generics.CreateAPIView):
     queryset = Result.objects.all()
     permission_classes = (CustomTokenPermission,)
 
-
 class ApproveCourseParticipant(APIView):
     permission_classes = (IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission,)
 

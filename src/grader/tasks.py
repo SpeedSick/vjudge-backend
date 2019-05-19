@@ -30,7 +30,7 @@ def stop_containers():
 def start_containers():
     # os.system("docker network connect vjudge-backend_default vjudge-backend_django_1")
     # os.system("NETWORK=my-net docker-compose up --abort-on-container-exit")
-    os.system("docker-compose up --abort-on-container-exit")
+    os.system("docker-compose up --build --abort-on-container-exit")
 
 
 def get_profile_id(cp):
@@ -106,7 +106,7 @@ def check_submissions(self, submission_ids):
 
             os.system("touch env.yml")
             with open("env.yml", "w") as f:
-                f.write("submission_id: {}\n".format(submission.id))
+                f.write("submission: {}\n".format(submission.id))
                 f.write("X_API_KEY: {}\n".format(core.settings.X_API_KEY))
                 f.write("url: http://django:8000/api/submission_result/\n")
                 f.write("TASK_URL: http://task:5000/\n")
