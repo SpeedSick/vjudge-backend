@@ -1,5 +1,6 @@
 from copy import copy
 
+from authentication.models import Profile
 from core.celery import app
 from main.models import Assignment, Course, Task, CourseParticipant
 
@@ -28,4 +29,10 @@ def clone_task_to_assignment(task_id, assignment_id):
 
 
 def get_or_create_course_participant(course_id: int, student_id: int) -> int:
-    return CourseParticipant.objects.get_or_create(course_id=course_id, student_id=student_id).id
+    return CourseParticipant.objects.get_or_create(course_id=course_id, student_id=student_id, is_approved=True).id
+
+
+def get_profile(user):
+    if user.is_anonymous:
+        return None
+    return Profile.objects.filter(id=user.id).last()

@@ -6,9 +6,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import Profile, User
-from main.models import News
+from grader.tasks import check_submissions
+from main.models import News, Submission
 from main.serializers.course import CourseRetrieveSerializer
 from main.serializers.course_participant import CourseParticipantApproveSerializer, CourseParticipantUpdateSerializer
+from main.serializers.submission import SubmissionSerializer, SubmissionRetrieveSerializer
+from main.utils import get_profile
 from .permissions import ApprovedUserAccessPermission, TeacherAccessPermission, StudentAccessPermission, \
     CustomTokenPermission
 from .serializers import CoursePostSerializer, CourseGetSerializer, CourseParticipantSerializer, AssignmentSerializer, \
@@ -159,17 +162,14 @@ class ApproveCourseParticipant(APIView):
     permission_classes = (IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission,)
 
     def post(self, request, format=None):
-
         serialized = CourseParticipantApproveSerializer(data=self.request.data)
-        if serialized.is_valid():
+        if serialized.is_valid(raise_exception=True):
             course = serialized.validated_data['course']
             if course.teacher_id == self.request.user.id:
                 serialized.approve()
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_403_FORBIDDEN)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class AssignmentsList(generics.ListAPIView):
@@ -181,6 +181,48 @@ class AssignmentsList(generics.ListAPIView):
         queryset = Assignment.objects.all()
         queryset = queryset.filter(course__participants__student=self.request.user.id) | queryset.filter(
             course__teacher=self.request.user.id)
-        return queryset.filter('-created')
+        return queryset.order_by('-created')
 
     serializer_class = AssignmentSerializer
+
+
+class CreateSubmissionView(APIView):
+    permission_classes = [IsAuthenticated, ApprovedUserAccessPermission, StudentAccessPermission, ]
+
+    def post(self, request, format=None):
+        task = Task.objects.get(pk=self.request.data['task'])
+        course_participant = CourseParticipant.objects.get(student_id=self.request.user.id,
+                                                           course_id=task.assignment.course)
+        serialized = SubmissionSerializer(data={
+            'task': task.id,
+            'course_participant': course_participant.id
+        })
+        if serialized.is_valid(raise_exception=True):
+            serialized.create(serialized.validated_data)
+            return Response(status=201, data=serialized.data)
+
+
+class SubmissionListView(generics.ListAPIView):
+    permissions_classes = (IsAuthenticated, ApprovedUserAccessPermission, StudentAccessPermission,)
+
+    def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return Submission.objects.none()
+        queryset = Submission.objects.filter(
+            course_participant__student_id=get_profile(self.request.user).id) | Submission.objects.filter(
+            course_participant__course__teacher_id=get_profile(self.request.user).id)
+        return queryset.order_by('-id')
+
+    serializer_class = SubmissionRetrieveSerializer
+
+
+class GradeSubmissionView(APIView):
+    permission_classes = [IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission, ]
+
+    def post(self, request, pk, format=None):
+        submission = Submission.objects.get(pk=pk)
+        profile = get_profile(request.user)
+        if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
+            return Response(status=403, data={'detail': 'Access forbidden'})
+        check_submissions.apply_async(kwargs={'submission_ids': pk})
+        return Response(status=200, data={'detail': 'Grade started'})

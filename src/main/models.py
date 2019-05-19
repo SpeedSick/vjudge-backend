@@ -14,6 +14,7 @@ class Assignment(models.Model):
     deadline = models.DateTimeField(null=True)
     created = models.DateField(auto_now_add=True)
     modified = models.DateField(auto_now=True)
+    git_fork_link = models.CharField(max_length=255)
 
     @receiver(post_save, sender='main.Assignment')
     def create_news_for_assignments(sender, instance=None, created=False, **kwargs):

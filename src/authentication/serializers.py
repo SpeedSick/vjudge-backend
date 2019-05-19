@@ -9,7 +9,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('user', 'is_approved', 'git_username',)
+        exclude = ('user', 'is_approved',)
 
 
 class UserSerializer(serializers.ModelSerializer):

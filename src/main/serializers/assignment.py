@@ -11,7 +11,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Assignment
-        fields = ('id', 'course', 'name', 'description', 'deadline', 'created', 'modified',)
+        fields = (
+            'id', 'course', 'name', 'description', 'deadline', 'folder_name', 'created', 'git_fork_link', 'modified',)
 
     def create(self, validated_data):
         return Assignment.objects.create(**validated_data)

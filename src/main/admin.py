@@ -9,5 +9,3 @@ admin.site.register(Result)
 admin.site.register(Submission)
 admin.site.register(CourseParticipant)
 admin.site.register(News)
-
-

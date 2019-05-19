@@ -9,7 +9,7 @@ class ResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Result
-        fields = ('submission', 'score', 'created')
+        fields = ('submission', 'score', 'created',)
 
     def create(self, validated_data):
         result = Result.objects.create(
