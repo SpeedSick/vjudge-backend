@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from authentication.models import Profile, User
-from grader.tasks import check_submissions
+from grader.tasks import check_submissions, grade
 from main.models import News, Submission
 from main.serializers.course_participant import CourseParticipantApproveSerializer, CourseParticipantUpdateSerializer
 from main.serializers.submission import SubmissionSerializer, SubmissionRetrieveSerializer
@@ -195,7 +195,7 @@ class CreateSubmissionView(APIView):
             profile = get_profile(request.user)
             if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
                 return Response(status=403, data={'detail': 'Access forbidden'})
-            check_submissions.apply_async(kwargs={'submission_ids': submission.pk})
+            grade.apply_async(kwargs={'course_participant_ids': [course_participant.id], 'submission_ids': [submission.id]})
             return Response(status=200, data={'detail': 'Grade started'})
 
 
