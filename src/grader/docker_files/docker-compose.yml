@@ -1,14 +1,26 @@
-version: '1'
+version: '3'
 
 services:
   task:
     build: .
     ports:
       - 5000:5000
+    networks:
+      - vjudge-backend_default
 
   tester:
-    image: "alan:tester"
+    image: "alanamanov/vjudge-tester:tester"
+    container_name: submission_tester
     volumes:
-      - tests.yml:./src/tests.yml:rw
+      - /Users/macbook/diploma/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/tests.yml:/src/tests.yml
+      - /Users/macbook/diploma/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/env.yml:/src/env.yml
+    command: bash -c "sleep 5s && python3 main.py"
     depends_on:
       - task
+    networks:
+      - vjudge-backend_default
+
+networks:
+  vjudge-backend_default:
+    external:
+      name: my-net

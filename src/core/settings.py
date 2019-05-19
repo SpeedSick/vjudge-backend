@@ -160,7 +160,18 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 X_API_KEY = "mad"
 
-BROKER_URL = 'pyamqp://diploma:diploma@rabbit:5672/diploma'
+
+# BROKER_URL = 'pyamqp://diploma:diploma@rabbit:5672/diploma'
+# CELERY_RESULT_BACKEND = 'rpc://'
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_TIMEZONE = 'Asia/Almaty'
+CELERY_ENABLE_UTC = True
+
+BROKER_URL = 'redis://redis:6379'
+# BROKER_URL = 'pyamqp://mlm:mlm@rabbit:5672/mlm'
+
 # BROKER_URL = 'pyamqp://mlm:mlm@rabbit:5672/mlm'
 
 EMAIL_USE_TLS = True
@@ -172,3 +183,4 @@ EMAIL_HOST_USER = 'alan.amanov98@gmail.com'
 EMAIL_HOST_PASSWORD = 't5amor31989A*'
 
 EMAIL_PORT = 587
+
