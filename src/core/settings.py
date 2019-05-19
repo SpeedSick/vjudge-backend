@@ -153,7 +153,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=30),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=300),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

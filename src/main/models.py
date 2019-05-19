@@ -15,6 +15,7 @@ class Assignment(models.Model):
     created = models.DateField(auto_now_add=True)
     modified = models.DateField(auto_now=True)
     git_fork_link = models.CharField(max_length=255)
+    points = models.DecimalField(max_digits=20, decimal_places=10, default=0.0)
 
     @receiver(post_save, sender='main.Assignment')
     def create_news_for_assignments(sender, instance=None, created=False, **kwargs):
@@ -82,6 +83,7 @@ class Task(models.Model):
     created = models.DateField(auto_now_add=True)
     modified = models.DateField(auto_now=True)
     testfile = models.FileField(null=True)
+    percentage = models.IntegerField(default=0)
 
 
 class Submission(models.Model):

@@ -38,7 +38,7 @@ class CourseViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-        serializer_class = CourseGetSerializer
+        serializer_class = CourseRetrieveSerializer
         if self.action in ('create', 'update', 'partial_update', 'destroy'):
             serializer_class = CoursePostSerializer
         elif self.action == 'retrieve':
@@ -198,8 +198,12 @@ class CreateSubmissionView(APIView):
             'course_participant': course_participant.id
         })
         if serialized.is_valid(raise_exception=True):
-            serialized.create(serialized.validated_data)
-            return Response(status=201, data=serialized.data)
+            submission = serialized.create(serialized.validated_data)
+            profile = get_profile(request.user)
+            if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
+                return Response(status=403, data={'detail': 'Access forbidden'})
+            check_submissions.apply_async(kwargs={'submission_ids': submission.pk})
+            return Response(status=200, data={'detail': 'Grade started'})
 
 
 class SubmissionListView(generics.ListAPIView):
@@ -214,15 +218,3 @@ class SubmissionListView(generics.ListAPIView):
         return queryset.order_by('-id')
 
     serializer_class = SubmissionRetrieveSerializer
-
-
-class GradeSubmissionView(APIView):
-    permission_classes = [IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission, ]
-
-    def post(self, request, pk, format=None):
-        submission = Submission.objects.get(pk=pk)
-        profile = get_profile(request.user)
-        if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
-            return Response(status=403, data={'detail': 'Access forbidden'})
-        check_submissions.apply_async(kwargs={'submission_ids': pk})
-        return Response(status=200, data={'detail': 'Grade started'})
