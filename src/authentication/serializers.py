@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from authentication.models import Profile, User
 
@@ -8,7 +9,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        exclude = ('user', 'is_approved', 'git_username',)
+        exclude = ('user', 'is_approved',)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,3 +70,17 @@ class UserPostSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.save()
         return instance
+
+
+class EmailSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=255)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).count() == 0:
+            raise ValidationError('No user found with this email')
+        return value
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)

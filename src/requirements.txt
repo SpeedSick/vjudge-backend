@@ -54,3 +54,4 @@ urllib3==1.24.2
 vine==1.3.0
 Pillow
 redis
+django-rest-passwordreset

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_rest_passwordreset',
     'corsheaders',
     'django_extensions',
     'rest_framework',
@@ -133,9 +134,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 REST_FRAMEWORK = MappingProxyType(
     {
-        #'DEFAULT_AUTHENTICATION_CLASSES': (
-        #    'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        #),
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        ),
         'DEFAULT_PERMISSION_CLASSES': (
             'rest_framework.permissions.AllowAny',
         ),
@@ -148,17 +149,17 @@ REST_FRAMEWORK = MappingProxyType(
     }
 )
 
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=30),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=300),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 X_API_KEY = "mad"
+
 
 # BROKER_URL = 'pyamqp://diploma:diploma@rabbit:5672/diploma'
 # CELERY_RESULT_BACKEND = 'rpc://'
@@ -170,3 +171,16 @@ CELERY_ENABLE_UTC = True
 
 BROKER_URL = 'redis://redis:6379'
 # BROKER_URL = 'pyamqp://mlm:mlm@rabbit:5672/mlm'
+
+# BROKER_URL = 'pyamqp://mlm:mlm@rabbit:5672/mlm'
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_HOST_USER = 'alan.amanov98@gmail.com'
+
+EMAIL_HOST_PASSWORD = 't5amor31989A*'
+
+EMAIL_PORT = 587
+

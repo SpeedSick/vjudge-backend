@@ -12,6 +12,7 @@ services:
   django:
     restart: always
     build: .
+
     command: bash -c "sleep 5s && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./src:/src
@@ -52,3 +53,4 @@ services:
 networks:
   my-net:
     name: my-net
+

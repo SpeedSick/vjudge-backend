@@ -24,7 +24,7 @@ class StudentAccessPermission(permissions.BasePermission):
         return not profile.is_teacher
 
 
-class TeacherAccessPermission(permissions.BasePermission):
+class   TeacherAccessPermission(permissions.BasePermission):
     message = 'Teachers are allowed'
 
     def has_permission(self, request, view):
