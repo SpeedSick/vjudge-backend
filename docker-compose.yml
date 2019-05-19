@@ -1,19 +1,25 @@
-version: '3'
+version: '3.5'
 
 services:
   db:
     image: postgres
     ports:
       - 5432:5432
+    networks:
+      - my-net
     volumes:
       - ./db:/var/lib/postgresql/data:rw
   django:
+    restart: always
     build: .
-    command: bash -c "sleep 5s && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "sleep 5s && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./src:/src
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8000:8000
+    networks:
+      - my-net
     environment:
       DJANGO_SETTINGS_MODULE: core.settings
     depends_on:
@@ -22,19 +28,27 @@ services:
     restart: always
     build: .
     command: celery -A core worker -l info -B
+    ports:
+      - 443:443
+    networks:
+      - my-net
     volumes:
       - ./src:/src
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - C_FORCE_ROOT=true
       - DJANGO_SETTINGS_MODULE=core.settings
     depends_on:
-      - rabbit
-  rabbit:
+      - redis
+
+  redis:
+    image: 'redis:3.0-alpine'
     restart: always
-    image: rabbitmq:alpine
     ports:
-      - 5672:5672
-    environment:
-      - RABBITMQ_DEFAULT_USER=diploma
-      - RABBITMQ_DEFAULT_PASS=diploma
-      - RABBITMQ_DEFAULT_VHOST=diploma
+      - 6379:6379
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    name: my-net
