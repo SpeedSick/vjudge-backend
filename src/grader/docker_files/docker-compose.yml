@@ -12,8 +12,8 @@ services:
     image: "alanamanov/vjudge-tester:tester"
     container_name: submission_tester
     volumes:
-      - /Users/macbook/diploma/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/tests.yml:/src/tests.yml
-      - /Users/macbook/diploma/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/env.yml:/src/env.yml
+      - /home/alan/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/tests.yml:/src/tests.yml
+      - /home/alan/vjudge-backend/src/repositories/kenenalmat/aplusb/src/assignment_1/task_1/env.yml:/src/env.yml
     command: bash -c "sleep 5s && python3 main.py"
     depends_on:
       - task
