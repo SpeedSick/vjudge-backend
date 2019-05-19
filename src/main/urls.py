@@ -12,6 +12,6 @@ urlpatterns = [
                   path('submission_result/', ResultCreateAPIView.as_view()),
                   path('approve_participant/', ApproveCourseParticipant.as_view(), name='approve-participant'),
                   path('submissions/', SubmissionListView.as_view(), name='retrieve-submissions'),
-                  path('submissions/', CreateSubmissionView.as_view(), name='submit'),
+                  path('submissions/<int:task>', CreateSubmissionView.as_view(), name='submit'),
                   path('my_assignments/', AssignmentsList.as_view(), name='my-submissions'),
               ] + router.urls

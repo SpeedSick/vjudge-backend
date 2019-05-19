@@ -151,6 +151,7 @@ class ResultCreateAPIView(generics.CreateAPIView):
     queryset = Result.objects.all()
     permission_classes = (CustomTokenPermission,)
 
+
 class ApproveCourseParticipant(APIView):
     permission_classes = (IsAuthenticated, ApprovedUserAccessPermission, TeacherAccessPermission,)
 
@@ -182,8 +183,8 @@ class AssignmentsList(generics.ListAPIView):
 class CreateSubmissionView(APIView):
     permission_classes = [IsAuthenticated, ApprovedUserAccessPermission, StudentAccessPermission, ]
 
-    def post(self, request, format=None):
-        task = Task.objects.get(pk=self.request.data['task'])
+    def post(self, request, task, format=None):
+        task = Task.objects.get(pk=task)
         course_participant = CourseParticipant.objects.get(student_id=self.request.user.id,
                                                            course_id=task.assignment.course)
         serialized = SubmissionSerializer(data={
@@ -195,7 +196,8 @@ class CreateSubmissionView(APIView):
             profile = get_profile(request.user)
             if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
                 return Response(status=403, data={'detail': 'Access forbidden'})
-            grade.apply_async(kwargs={'course_participant_ids': [course_participant.id], 'submission_ids': [submission.id]})
+            grade.apply_async(
+                kwargs={'course_participant_ids': [course_participant.id], 'submission_ids': [submission.id]})
             return Response(status=200, data={'detail': 'Grade started'})
 
 
