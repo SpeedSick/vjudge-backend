@@ -99,24 +99,13 @@ class AssignmentViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = Assignment.objects.all()
-        data = self.request.query_params
-
-        if self.action in ('update', 'partial_update', 'destroy'):
-            queryset = queryset.filter(course__teacher=self.request.user)
-
-        if 'course' in data:
-            course = Course.objects.filter(pk=data['course']).last()
-            if course.teacher == self.request.user:
-                queryset = queryset.filter(course=course)
-            else:
-                queryset = queryset.none()
-
-        elif 'student' in data:
-            queryset = queryset.filter(course__participants__student=self.request.user.id)
-            print(queryset)
+        if self.action in ('update', 'partial_update', 'destroy',):
+            queryset = queryset.filter(course__teacher=self.request.user.id)
+        elif self.action in ('retrieve', 'list',):
+            queryset = queryset.filter(course__teacher=self.request.user.id) | queryset.filter(
+                course__participants__student=self.request.user.id)
         else:
             queryset = queryset.none()
-
         return queryset
 
 

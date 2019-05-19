@@ -13,7 +13,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = (
             'id', 'course', 'name', 'description', 'deadline', 'folder_name', 'created', 'git_fork_link', 'modified',
-            'points',)
+            'points', 'tasks',)
 
     def create(self, validated_data):
         return Assignment.objects.create(**validated_data)
