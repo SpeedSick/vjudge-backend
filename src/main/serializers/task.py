@@ -1,11 +1,14 @@
 from rest_framework import serializers
 
 from main.models import Task
+from .submission import SubmissionSerializer
+from .result import ResultSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
     created = serializers.DateField(required=False)
     modified = serializers.DateField(required=False)
+    submissions = SubmissionSerializer(many=True, required=False)
 
     class Meta:
         model = Task
