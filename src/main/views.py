@@ -194,7 +194,7 @@ class CreateSubmissionView(APIView):
         if serialized.is_valid(raise_exception=True):
             submission = serialized.create(serialized.validated_data)
             profile = get_profile(request.user)
-            if profile is None or not profile.is_teacher or submission.task.assignment.course.teacher_id != profile.id:
+            if profile is None or not course_participant.is_approved:
                 return Response(status=403, data={'detail': 'Access forbidden'})
             grade.apply_async(
                 kwargs={'course_participant_ids': [course_participant.id], 'submission_ids': [submission.id]})
