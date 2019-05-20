@@ -9,7 +9,7 @@ from authentication.models import Profile, User
 from grader.tasks import check_submissions, grade
 from main.models import News, Submission
 from main.serializers.course_participant import CourseParticipantApproveSerializer, CourseParticipantUpdateSerializer
-from main.serializers.submission import SubmissionSerializer, SubmissionRetrieveSerializer
+from main.serializers.submission import SubmissionSerializer, SubmissionRetrieveSerializer, SubmissionPostSerializer
 from main.utils import get_profile
 from .permissions import ApprovedUserAccessPermission, TeacherAccessPermission, StudentAccessPermission, \
     CustomTokenPermission
@@ -187,7 +187,7 @@ class CreateSubmissionView(APIView):
         task = Task.objects.get(pk=task)
         course_participant = CourseParticipant.objects.get(student_id=self.request.user.id,
                                                            course_id=task.assignment.course)
-        serialized = SubmissionSerializer(data={
+        serialized = SubmissionPostSerializer(data={
             'task': task.id,
             'course_participant': course_participant.id
         })
