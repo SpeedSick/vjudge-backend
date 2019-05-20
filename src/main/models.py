@@ -60,7 +60,7 @@ class Course(models.Model):
 
     @property
     def non_approved_students(self):
-        return User.objects.filter(Q(participations__course=self) & Q(participations__is_approved=True))
+        return User.objects.filter(Q(participations__course=self) & Q(participations__is_approved=False))
 
 
 class News(models.Model):
