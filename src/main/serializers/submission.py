@@ -7,11 +7,11 @@ from .result import ResultSerializer
 
 class SubmissionPostSerializer(serializers.ModelSerializer):
     task = serializers.PrimaryKeyRelatedField(many=False, queryset=Task.objects.all())
-    results = ResultSerializer(required=False, many=True)
+    course_participant = serializers.PrimaryKeyRelatedField(many=False, queryset=CourseParticipant.objects.all())
 
     class Meta:
         model = Submission
-        fields = ('task', 'course_participant', 'results',)
+        fields = ('task', 'course_participant',)
 
     def create(self, validated_data):
         return Submission.objects.create(**validated_data)
