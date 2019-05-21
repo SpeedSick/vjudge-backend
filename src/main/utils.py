@@ -35,4 +35,4 @@ def get_or_create_course_participant(course_id: int, student_id: int) -> int:
 def get_profile(user):
     if user.is_anonymous:
         return None
-    return Profile.objects.filter(id=user.id).last()
+    return User.objects.get(pk=request.user.id).profile

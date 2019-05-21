@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import permissions
 
 from authentication.models import Profile
@@ -10,7 +11,7 @@ class ApprovedUserAccessPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_superuser:
             return True
-        profile = Profile.objects.filter(pk=request.user.id).last()
+        profile = User.objects.get(pk=request.user.id).profile
         return profile.is_approved
 
 
@@ -20,17 +21,17 @@ class StudentAccessPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.user.is_superuser:
             return True
-        profile = Profile.objects.filter(pk=request.user.id).last()
+        profile = User.objects.get(pk=request.user.id).profile
         return not profile.is_teacher
 
 
-class   TeacherAccessPermission(permissions.BasePermission):
+class TeacherAccessPermission(permissions.BasePermission):
     message = 'Teachers are allowed'
 
     def has_permission(self, request, view):
         if request.user.is_superuser:
             return True
-        profile = Profile.objects.filter(pk=request.user.id).last()
+        profile = User.objects.get(pk=request.user.id).profile
         return profile.is_teacher
 
 

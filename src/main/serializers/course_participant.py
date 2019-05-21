@@ -15,7 +15,7 @@ class CourseParticipantSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        user_profile = Profile.objects.get(id=user.id)
+        user_profile = User.objects.get(pk=user.id).profile
         if not user_profile.is_teacher:
             user = validated_data.pop('student')
         else:
@@ -27,7 +27,7 @@ class CourseParticipantSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         user = self.context['request'].user
-        user_profile = Profile.objects.get(id=user.id)
+        user_profile = User.objects.get(pk=user.id).profile
         if user_profile.is_teacher and user.id == instance.course.teacher_id:
             instance.is_approved = True
         instance.save()
