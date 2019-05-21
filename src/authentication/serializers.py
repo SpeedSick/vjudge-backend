@@ -58,7 +58,7 @@ class UserPostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'profile' in validated_data:
             profile_data = validated_data.pop('profile')
-            profile = User.objects.get(pk=self.context['request'].user).profile
+            profile = User.objects.get(pk=self.context['request'].user.id).profile
             serialized = ProfileSerializer(data=profile_data)
             if serialized.is_valid():
                 serialized.update(profile, serialized.validated_data)
