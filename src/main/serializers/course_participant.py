@@ -50,10 +50,13 @@ class CourseParticipantApproveSerializer(serializers.Serializer):
     course = serializers.PrimaryKeyRelatedField(many=False, queryset=Course.objects.all())
 
     def approve(self):
-        CourseParticipant.objects.filter(student=self.validated_data['student'],
-                                         course=self.validated_data['course']).delete()
-        course_participant, created = CourseParticipant.objects.get_or_create(student=self.validated_data['student'],
-                                                                              course=self.validated_data['course'])
+        course_participant = CourseParticipant.objects.filter(student=self.validated_data['student'],
+                                                              course=self.validated_data['course']).last()
+        if course_participant is None:
+            course_participant, created = CourseParticipant.objects.get_or_create(
+                student=self.validated_data['student'],
+                course=self.validated_data['course']
+            )
         course_participant.is_approved = True
         course_participant.save()
         return True
