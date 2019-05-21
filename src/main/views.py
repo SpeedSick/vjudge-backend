@@ -69,7 +69,7 @@ class CourseViewSet(ModelViewSet):
             CourseParticipant.objects.create(**serialized.validated_data)
             return Response(data=serialized.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['retrieve'])
+    @action(detail=True, methods=['get'])
     def participation(self, request, pk=None):
         if request.user.is_anonymous:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
