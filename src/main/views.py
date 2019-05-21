@@ -69,6 +69,23 @@ class CourseViewSet(ModelViewSet):
             CourseParticipant.objects.create(**serialized.validated_data)
             return Response(data=serialized.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['retrieve'])
+    def participation(self, request, pk=None):
+        if request.user.is_anonymous:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        participation = CourseParticipant.objects.filter(student_id=self.request.user.id, course=pk,
+                                                         is_approved=True).last()
+        if participation is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        data = {
+            'student': request.user.id,
+            'course': pk,
+            'is_approved': True,
+        }
+        serialized = CourseParticipantSerializer(data=data)
+        if serialized.is_valid(raise_exception=True):
+            return Response(status=status.HTTP_200_OK, data=serialized.data)
+
     def finalize_response(self, request, response, *args, **kwargs):
         if self.action in ('retrieve',):
             user = request.user
@@ -213,3 +230,14 @@ class SubmissionListView(generics.ListAPIView):
         return queryset.order_by('-id')
 
     serializer_class = SubmissionRetrieveSerializer
+
+
+class MyParticipationsListView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated, ApprovedUserAccessPermission, StudentAccessPermission)
+
+    def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return CourseParticipant.objects.none()
+        return CourseParticipant.objects.filter(student_id=self.request.user.id)
+
+    serializer_class = CourseParticipantSerializer

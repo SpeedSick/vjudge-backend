@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import CourseViewSet, AssignmentViewSet, TaskViewSet, ResultCreateAPIView, \
-    ApproveCourseParticipant, AssignmentsList, SubmissionListView, CreateSubmissionView
+    ApproveCourseParticipant, AssignmentsList, SubmissionListView, CreateSubmissionView, MyParticipationsListView
 
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='Course')
@@ -14,4 +14,5 @@ urlpatterns = [
                   path('submissions/', SubmissionListView.as_view(), name='retrieve-submissions'),
                   path('submissions/<int:task>', CreateSubmissionView.as_view(), name='submit'),
                   path('my_assignments/', AssignmentsList.as_view(), name='my-submissions'),
+                  path('participations/', MyParticipationsListView.as_view(), name='participations'),
               ] + router.urls
