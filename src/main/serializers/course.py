@@ -48,8 +48,8 @@ class CourseGetSerializer(serializers.ModelSerializer):
     teacher = UserSerializer()
     assignments = AssignmentSerializer(many=True)
     notifications = serializers.SerializerMethodField()
-    students = UserSerializer(many=True)
-    non_approved_students = UserSerializer(many=True)
+    students = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
+    non_approved_students = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
     def get_notifications(self, instance):
         if self.context['request'].user.is_anonymous:

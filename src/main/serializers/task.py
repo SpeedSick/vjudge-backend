@@ -6,10 +6,18 @@ from .result import ResultSerializer
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    max_tries = serializers.IntegerField(required=False)
     created = serializers.DateField(required=False)
     modified = serializers.DateField(required=False)
     my_percentage = serializers.SerializerMethodField(required=False)
     submissions = SubmissionSerializer(many=True, required=False)
+    tries_done = serializers.SerializerMethodField(required=False)
+
+    def get_tries_done(self, instance):
+        if self.context['request'].user.is_anonymous:
+            return None
+        submissions = instance.submissions.filter(course_participant__student=self.context['request'].user.id)
+        return len(submissions)
 
     def get_my_percentage(self, instance):
         if self.context['request'].user.is_anonymous:

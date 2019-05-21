@@ -87,6 +87,7 @@ class Task(models.Model):
     modified = models.DateField(auto_now=True)
     testfile = models.FileField(null=True)
     percentage = models.IntegerField(default=0)
+    max_tries = models.IntegerField(default=3)
 
 
 class Submission(models.Model):
