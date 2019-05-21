@@ -77,14 +77,7 @@ class CourseViewSet(ModelViewSet):
                                                          is_approved=True).last()
         if participation is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        data = {
-            'student': request.user.id,
-            'course': pk,
-            'is_approved': True,
-        }
-        serialized = CourseParticipantSerializer(data=data)
-        if serialized.is_valid(raise_exception=True):
-            return Response(status=status.HTTP_200_OK, data=serialized.data)
+        return Response(status=status.HTTP_200_OK, data={"git_repository_name": participation.git_repository_name})
 
     def finalize_response(self, request, response, *args, **kwargs):
         if self.action in ('retrieve',):
