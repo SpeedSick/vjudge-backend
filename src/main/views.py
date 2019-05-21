@@ -218,8 +218,8 @@ class SubmissionListView(generics.ListAPIView):
         if self.request.user.is_anonymous:
             return Submission.objects.none()
         queryset = Submission.objects.filter(
-            course_participant__student_id=get_profile(self.request.user).id) | Submission.objects.filter(
-            course_participant__course__teacher_id=get_profile(self.request.user).id)
+            course_participant__student_id=self.request.user.id) | Submission.objects.filter(
+            course_participant__course__teacher_id=self.request.user.id)
         return queryset.order_by('-id')
 
     serializer_class = SubmissionRetrieveSerializer
