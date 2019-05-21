@@ -1,5 +1,7 @@
 from copy import copy
 
+from django_rest_passwordreset.views import User
+
 from authentication.models import Profile
 from core.celery import app
 from main.models import Assignment, Course, Task, CourseParticipant
@@ -35,4 +37,4 @@ def get_or_create_course_participant(course_id: int, student_id: int) -> int:
 def get_profile(user):
     if user.is_anonymous:
         return None
-    return User.objects.get(pk=request.user.id).profile
+    return User.objects.get(pk=user.id).profile
